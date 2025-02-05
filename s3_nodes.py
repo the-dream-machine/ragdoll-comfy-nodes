@@ -13,11 +13,11 @@ from PIL import Image
 )
 def save_image_to_s3(
     image: ImageTensor,
-    key: str = StringInput("folder/subfolder/image.jpg"),  # Supports full path
+    key: str = StringInput("folder/image.png"),  # Supports full path
     bucket_name: str = StringInput("YourBucketName"),
     access_key_id_env: str = StringInput("AWS_ACCESS_KEY_ID"),
     secret_access_key_env: str = StringInput("AWS_SECRET_ACCESS_KEY"),
-    region_env: str = StringInput("AWS_DEFAULT_REGION"),  # Default region
+    region_env: str = StringInput("AWS_REGION"),  # Default region
     endpoint_url_env: str = StringInput("AWS_ENDPOINT_URL"),  # Default endpoint
 ) -> ImageTensor:
     """
@@ -26,7 +26,7 @@ def save_image_to_s3(
     # Retrieve AWS credentials and configuration from environment variables
     aws_access_key_id = os.getenv(access_key_id_env)
     aws_secret_access_key = os.getenv(secret_access_key_env)
-    aws_region = os.getenv(region_env, "us-east-1")
+    aws_region = os.getenv(region_env, "auto")
     aws_endpoint_url = os.getenv(endpoint_url_env, "https://s3.amazonaws.com")
 
     # Check if essential credentials are available
