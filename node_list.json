@@ -1,0 +1,3 @@
+{
+  "Save Image to S3": "Saves an image to an S3 bucket and returns the image for preview."
+}
