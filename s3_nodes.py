@@ -53,8 +53,6 @@ def save_image_to_s3(
         i = i[0]  # Take first image if we have a batch
     img = Image.fromarray(np.clip(i, 0, 255).astype(np.uint8))
 
-    show_image([img])
-
     # Convert PIL Image to bytes
     img_byte_arr = BytesIO()
     img.save(img_byte_arr, format="PNG", optimize=True)
@@ -62,5 +60,7 @@ def save_image_to_s3(
 
     # Upload to S3
     s3_client.put_object(Body=img_byte_arr, Key=key, Bucket=bucket_name)
+
+    show_image(image)
 
     return image
