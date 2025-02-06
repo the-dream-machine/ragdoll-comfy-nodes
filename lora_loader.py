@@ -36,6 +36,7 @@ def save_image_to_s3(
             "AWS credentials are not properly set in the environment variables."
         )
 
+    # Initialize the S3 client with the retrieved credentials and configuration
     s3_client = boto3.client(
         "s3",
         region_name=aws_region,
@@ -56,6 +57,7 @@ def save_image_to_s3(
     img.save(img_byte_arr, format=format)
     img_byte_arr.seek(0)
 
+    # Upload to S3
     s3_client.put_object(
         Body=img_byte_arr,
         Key=key,
