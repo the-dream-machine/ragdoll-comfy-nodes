@@ -48,8 +48,10 @@ def save_image_to_s3(
 
     results = []
     for batch_number, image in enumerate(images):
+        print(f"Image tensor: {image}")
+        
         # Convert tensor to PIL Image
-        i = 255. * image.cpu().numpy()
+        i = np.squeeze(image.cpu().numpy()) * 255.
         img = Image.fromarray(np.clip(i, 0, 255).astype(np.uint8))
         
 
