@@ -47,14 +47,11 @@ def save_image_to_s3(
         aws_secret_access_key=aws_secret_access_key,
     )
 
-    # Convert tensor to PIL Image (using the reference implementation's conversion)
-    # i = 255.0 * image.cpu().numpy()
-    # i = np.squeeze(i)
-    # if len(i.shape) == 4:
-    #     i = i[0]  # Take first image if we have a batch
-    # img = Image.fromarray(np.clip(i, 0, 255).astype(np.uint8))
-
+    # Convert tensor to PIL Image
     i = 255.0 * image.cpu().numpy()
+    i = np.squeeze(i)
+    if len(i.shape) == 4:
+        i = i[0]  # Take first image if we have a batch
     img = Image.fromarray(np.clip(i, 0, 255).astype(np.uint8))
 
     # Convert PIL Image to bytes
