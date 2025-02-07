@@ -22,7 +22,7 @@ def save_image_to_s3(
     region_env: str = StringInput("AWS_REGION"),
     endpoint_url_env: str = StringInput("AWS_ENDPOINT_URL"),
     format: str = Choice(["PNG", "JPG", "JPEG", "WEBP"]),
-):
+) -> str:
     """
     Saves the provided image to the specified S3 bucket and shows a preview of the image.
     """
@@ -63,4 +63,4 @@ def save_image_to_s3(
         ContentType=f"image/{format.lower()}",
     )
 
-    return [f"{bucket_name}/{key}"]
+    return f"{aws_endpoint_url}/{bucket_name}/{key}"
