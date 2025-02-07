@@ -1,5 +1,6 @@
 import os
 from io import BytesIO
+from typing import List
 
 import boto3
 import numpy as np
@@ -12,6 +13,7 @@ from PIL import Image
     display_name="Save Image to S3",
     description="Saves an image to an S3 bucket and shows a preview of the image.",
     is_output_node=True,
+    return_names=["image"],
 )
 def save_image_to_s3(
     image: ImageTensor,
@@ -22,7 +24,7 @@ def save_image_to_s3(
     region_env: str = StringInput("AWS_REGION"),
     endpoint_url_env: str = StringInput("AWS_ENDPOINT_URL"),
     format: str = Choice(["PNG", "JPG", "JPEG", "WEBP"]),
-) -> ImageTensor:
+) -> List[ImageTensor]:
     """
     Saves the provided image to the specified S3 bucket and shows a preview of the image.
     """
@@ -63,6 +65,4 @@ def save_image_to_s3(
         ContentType=f"image/{format.lower()}",
     )
 
-    show_image(image)
-
-    return image
+    return {"ui": {"image": {"filename": key, "subfolder": "", "type": "output"}}}
