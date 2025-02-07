@@ -11,7 +11,8 @@ from PIL import Image
 @ComfyNode(
     category="image",
     display_name="Save Image to S3",
-    description="Saves an image to an S3 bucket and shows a preview of the image.",
+    description="Saves an image to an S3 bucket.",
+    is_output_node=False,
 )
 def save_image_to_s3(
     image: ImageTensor,
@@ -22,9 +23,9 @@ def save_image_to_s3(
     region_env: str = StringInput("AWS_REGION"),
     endpoint_url_env: str = StringInput("AWS_ENDPOINT_URL"),
     format: str = Choice(["PNG", "JPG", "JPEG", "WEBP"]),
-) -> str:
+):
     """
-    Saves the provided image to the specified S3 bucket and shows a preview of the image.
+    Saves the provided image to the specified S3 bucket.
     """
     aws_access_key_id = os.getenv(access_key_id_env)
     aws_secret_access_key = os.getenv(secret_access_key_env)
@@ -62,5 +63,3 @@ def save_image_to_s3(
         Bucket=bucket_name,
         ContentType=f"image/{format.lower()}",
     )
-
-    return f"{aws_endpoint_url}/{bucket_name}/{key}"
