@@ -63,3 +63,5 @@ def save_image_to_s3(
         Bucket=bucket_name,
         ContentType=f"image/{format.lower()}",
     )
+
+    return {"ui": {"images": [{"filename": key, "subfolder": "", "type": "output"}]}}
