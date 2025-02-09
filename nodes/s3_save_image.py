@@ -8,11 +8,10 @@ from cuid2 import Cuid
 from PIL import Image
 from PIL.PngImagePlugin import PngInfo
 
-CUID_GENERATOR: Cuid = Cuid(length=10)
-
 
 class S3SaveImage:
     def __init__(self):
+        self.cuid: Cuid = Cuid()
         self.client = boto3.client(
             "s3",
             region_name=os.environ.get("AWS_REGION", "auto"),
@@ -71,7 +70,7 @@ class S3SaveImage:
                     metadata.add_text(key, json.dumps(value))
 
             # Generate unique filename using cuid2
-            unique_id = CUID_GENERATOR.generate()
+            unique_id = self.cuid.generate()
             filename = f"{unique_id}.png"
             s3_key = f"{folder}/{filename}" if folder else filename  # Path in S3
 
