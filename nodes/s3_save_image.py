@@ -72,7 +72,7 @@ class S3SaveImage:
             # Generate unique filename using cuid2
             unique_id = self.cuid.generate()
             filename = f"{unique_id}.png"
-            s3_key = f"{folder}/{filename}" if folder else filename  # Path in S3
+            s3_key = f"{folder}/{filename}" if folder else filename
 
             # Save image to in-memory file
             image_buffer = io.BytesIO()
@@ -83,6 +83,6 @@ class S3SaveImage:
             self.client.upload_fileobj(image_buffer, bucket, s3_key)
 
             # Store result
-            results.append({"filename": filename, "s3_key": s3_key})
+            results.append({"filename": filename})
 
         return {"ui": {"images": results}}
