@@ -28,7 +28,7 @@ class S3SaveImage:
                 "bucket": (
                     "STRING",
                     {
-                        "default": "images.development.ragdollai.xyz",
+                        "default": "my_image_bucket",
                         "tooltip": "The name of the S3 bucket to save the images to.",
                     },
                 ),
@@ -49,7 +49,7 @@ class S3SaveImage:
     def s3_save_images(
         self,
         images,
-        bucket="images.development.ragdollai.xyz",
+        bucket="my_image_bucket",
         folder="",
         prompt=None,
         extra_pnginfo=None,
