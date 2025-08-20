@@ -30,7 +30,7 @@ class S3SaveImages:
                 "bucket": (
                     "STRING",
                     {
-                        "default": "my_image_bucket",
+                        "default": "images.development.ragdoll.so",
                         "tooltip": "The name of the S3 bucket to save the images to.",
                     },
                 ),

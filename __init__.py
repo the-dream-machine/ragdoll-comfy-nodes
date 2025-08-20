@@ -5,5 +5,5 @@ NODE_CLASS_MAPPINGS = {
 }
 
 NODE_DISPLAY_NAME_MAPPINGS = {
-    "Save Images To S3": "💾 Save Your Images to S3",
+    "Save Images To S3": "💾 Save Images to S3",
 }
