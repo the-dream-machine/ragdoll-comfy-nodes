@@ -45,6 +45,16 @@ class S3SaveImages:
                         "tooltip": "Custom ID to use for the image filename. If empty, a unique ID will be generated.",
                     },
                 ),
+                "compress_level": (
+                    "INT",
+                    {
+                        "default": 6,
+                        "min": 0,
+                        "max": 9,
+                        "step": 1,
+                        "tooltip": "PNG compression level (0-9). Higher is smaller but slower.",
+                    },
+                ),
             },
             "hidden": {"prompt": "PROMPT", "extra_pnginfo": "EXTRA_PNGINFO"},
         }
@@ -61,6 +71,7 @@ class S3SaveImages:
         bucket: str = "my_image_bucket",
         folder: str = "",
         image_id: str = "",
+        compress_level: int = 6,
         prompt: Optional[dict[str, Any]] = None,
         extra_pnginfo: Optional[dict[str, Any]] = None,
     ) -> "dict[str, dict[str, list[dict[str, str]]]]":
@@ -93,7 +104,12 @@ class S3SaveImages:
 
             # Save image to in-memory file
             image_buffer = io.BytesIO()
-            img.save(image_buffer, format="PNG", pnginfo=metadata)
+            img.save(
+                image_buffer,
+                format="PNG",
+                pnginfo=metadata,
+                compress_level=compress_level,
+            )
             image_buffer.seek(0)  # Reset buffer position
 
             # Upload to S3
