@@ -90,6 +90,31 @@ class S3SaveImages:
                 for key, value in extra_pnginfo.items():
                     metadata.add_text(key, json.dumps(value))
 
+            # --- Start of Debugging Code ---
+            print(f"[S3SaveImages Debug] Received compress_level: {compress_level}")
+
+            # Test compression 0
+            buffer_0 = io.BytesIO()
+            img.save(buffer_0, format="PNG", pnginfo=metadata, compress_level=0)
+            size_0 = buffer_0.tell()
+            print(f"[S3SaveImages Debug] Size with compress_level=0: {size_0} bytes")
+
+            # Test compression 9
+            buffer_9 = io.BytesIO()
+            img.save(buffer_9, format="PNG", pnginfo=metadata, compress_level=9)
+            size_9 = buffer_9.tell()
+            print(f"[S3SaveImages Debug] Size with compress_level=9: {size_9} bytes")
+
+            if size_0 == size_9:
+                print(
+                    "[S3SaveImages Debug] WARNING: No size difference between compress level 0 and 9."
+                )
+            else:
+                print(
+                    "[S3SaveImages Debug] SUCCESS: Compression level appears to be working."
+                )
+            # --- End of Debugging Code ---
+
             # Generate filename
             if image_id:
                 if len(images) > 1:
