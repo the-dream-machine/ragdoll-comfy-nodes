@@ -1,15 +1,17 @@
 import io
 import json
 import os
+from typing import Any, Optional
 
 import boto3
 import numpy as np
+import torch
 from cuid2 import Cuid
 from PIL import Image
 from PIL.PngImagePlugin import PngInfo
 
 
-class S3SaveImage:
+class S3SaveImages:
     def __init__(self):
         self.cuid: Cuid = Cuid()
         self.client = boto3.client(
@@ -36,6 +38,13 @@ class S3SaveImage:
                     "STRING",
                     {"default": "", "tooltip": "The folder to save the images to."},
                 ),
+                "image_id": (
+                    "STRING",
+                    {
+                        "default": "",
+                        "tooltip": "Custom ID to use for the image filename. If empty, a unique ID will be generated.",
+                    },
+                ),
             },
             "hidden": {"prompt": "PROMPT", "extra_pnginfo": "EXTRA_PNGINFO"},
         }
@@ -48,18 +57,19 @@ class S3SaveImage:
 
     def s3_save_images(
         self,
-        images,
-        bucket="my_image_bucket",
-        folder="",
-        prompt=None,
-        extra_pnginfo=None,
-    ):
+        images: torch.Tensor,
+        bucket: str = "my_image_bucket",
+        folder: str = "",
+        image_id: str = "",
+        prompt: Optional[dict[str, Any]] = None,
+        extra_pnginfo: Optional[dict[str, Any]] = None,
+    ) -> "dict[str, dict[str, list[dict[str, str]]]]":
         results = []
 
-        for image in images:
+        for index, image in enumerate(images):
             # Convert tensor to image
-            i = 255.0 * image.cpu().numpy()
-            img = Image.fromarray(np.clip(i, 0, 255).astype(np.uint8))
+            img_array = 255.0 * image.cpu().numpy()
+            img = Image.fromarray(np.clip(img_array, 0, 255).astype(np.uint8))
             metadata = PngInfo()
 
             # Add metadata
@@ -69,9 +79,16 @@ class S3SaveImage:
                 for key, value in extra_pnginfo.items():
                     metadata.add_text(key, json.dumps(value))
 
-            # Generate unique filename using cuid2
-            unique_id = self.cuid.generate()
-            filename = f"{unique_id}.png"
+            # Generate filename
+            if image_id:
+                if len(images) > 1:
+                    filename = f"{image_id}_{index}.png"
+                else:
+                    filename = f"{image_id}.png"
+            else:
+                unique_id = self.cuid.generate()
+                filename = f"{unique_id}.png"
+
             s3_key = f"{folder}/{filename}" if folder else filename
 
             # Save image to in-memory file

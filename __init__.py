@@ -1,9 +1,9 @@
-from .nodes.s3_save_image import S3SaveImage
+from .nodes.s3_save_images import S3SaveImages
 
 NODE_CLASS_MAPPINGS = {
-    "Save Image To S3": S3SaveImage,
+    "Save Images To S3": S3SaveImages,
 }
 
 NODE_DISPLAY_NAME_MAPPINGS = {
-    "Save Image To S3": "💾 Save Your Image to S3",
+    "Save Images To S3": "💾 Save Your Images to S3",
 }
