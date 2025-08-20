@@ -1,0 +1,37 @@
+{
+  "lsp": {
+    "ruff": {
+      "initialization_options": {
+        "settings": {
+          "configuration": "ruff.toml",
+          "configurationPreference": "filesystemFirst"
+        }
+      }
+    },
+
+    "basedpyright": {
+      "settings": {
+        "python": {
+          "pythonPath": ".venv/bin/python"
+        },
+        "basedpyright.analysis": {
+          "diagnosticMode": "openFilesOnly"
+        }
+      }
+    }
+  },
+  "languages": {
+    "Python": {
+      "language_servers": ["ruff", "basedpyright"],
+      "format_on_save": "on",
+      "formatter": [
+        {
+          "code_actions": {
+            "source.fixAll.ruff": true,
+            "source.organizeImports.ruff": true
+          }
+        }
+      ]
+    }
+  }
+}
