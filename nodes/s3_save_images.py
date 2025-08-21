@@ -59,12 +59,12 @@ class S3SaveImages:
             "hidden": {"prompt": "PROMPT", "extra_pnginfo": "EXTRA_PNGINFO"},
         }
 
-    RETURN_TYPES = ("STRING",)
-    RETURN_NAMES = ("urls",)
+    RETURN_TYPES = ("STRING", "IMAGE")
+    RETURN_NAMES = ("urls", "images")
     FUNCTION = "s3_save_images"
     OUTPUT_NODE = False
     CATEGORY = "image"
-    DESCRIPTION = "Saves the input images to an S3 bucket and returns their URLs."
+    DESCRIPTION = "Saves images to S3 and returns their URLs and the original images."
 
     def s3_save_images(
         self,
@@ -75,7 +75,7 @@ class S3SaveImages:
         compress_level: int = 6,
         prompt: Optional[dict[str, Any]] = None,
         extra_pnginfo: Optional[dict[str, Any]] = None,
-    ) -> Tuple[str]:
+    ) -> Tuple[str, torch.Tensor]:
         urls = []
 
         for index, image in enumerate(images):
@@ -120,4 +120,4 @@ class S3SaveImages:
             url = f"https://{bucket}/{s3_key}"
             urls.append(url)
 
-        return ("\n".join(urls),)
+        return ("\n".join(urls), images)
