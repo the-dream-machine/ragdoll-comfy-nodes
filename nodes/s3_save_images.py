@@ -1,7 +1,7 @@
 import io
 import json
 import os
-from typing import Any, Optional
+from typing import Any, Optional, Tuple
 
 import boto3
 import numpy as np
@@ -59,11 +59,12 @@ class S3SaveImages:
             "hidden": {"prompt": "PROMPT", "extra_pnginfo": "EXTRA_PNGINFO"},
         }
 
-    RETURN_TYPES = ()
+    RETURN_TYPES = ("STRING",)
+    RETURN_NAMES = ("urls",)
     FUNCTION = "s3_save_images"
-    OUTPUT_NODE = True
+    OUTPUT_NODE = False
     CATEGORY = "image"
-    DESCRIPTION = "Saves the input images to an S3 bucket."
+    DESCRIPTION = "Saves the input images to an S3 bucket and returns their URLs."
 
     def s3_save_images(
         self,
@@ -74,8 +75,8 @@ class S3SaveImages:
         compress_level: int = 6,
         prompt: Optional[dict[str, Any]] = None,
         extra_pnginfo: Optional[dict[str, Any]] = None,
-    ) -> "dict[str, dict[str, list[dict[str, str]]]]":
-        results = []
+    ) -> Tuple[str]:
+        urls = []
 
         for index, image in enumerate(images):
             # Convert tensor to image
@@ -102,7 +103,7 @@ class S3SaveImages:
 
             s3_key = f"{folder}/{filename}" if folder else filename
 
-            # Save image to in-memory file
+            # Save image to in-memory buffer for S3 upload
             image_buffer = io.BytesIO()
             img.save(
                 image_buffer,
@@ -110,12 +111,13 @@ class S3SaveImages:
                 pnginfo=metadata,
                 compress_level=compress_level,
             )
-            image_buffer.seek(0)  # Reset buffer position
+            image_buffer.seek(0)
 
             # Upload to S3
             self.client.upload_fileobj(image_buffer, bucket, s3_key)
 
-            # Store result
-            results.append({"filename": filename})
+            # Store URL
+            url = f"https://{bucket}/{s3_key}"
+            urls.append(url)
 
-        return {"ui": {"images": results}}
+        return ("\n".join(urls),)
