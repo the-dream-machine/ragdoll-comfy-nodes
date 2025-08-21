@@ -1,9 +1,10 @@
 import io
 import json
 import os
-from typing import Any, Optional, Tuple
+from typing import Any, Optional, cast
 
 import boto3
+import folder_paths  # pyright: ignore[reportMissingImports]
 import numpy as np
 import torch
 from cuid2 import Cuid
@@ -59,12 +60,11 @@ class S3SaveImages:
             "hidden": {"prompt": "PROMPT", "extra_pnginfo": "EXTRA_PNGINFO"},
         }
 
-    RETURN_TYPES = ("STRING", "IMAGE")
-    RETURN_NAMES = ("urls", "images")
+    RETURN_TYPES = ()
     FUNCTION = "s3_save_images"
-    OUTPUT_NODE = False
+    OUTPUT_NODE = True
     CATEGORY = "image"
-    DESCRIPTION = "Saves images to S3 and returns their URLs and the original images."
+    DESCRIPTION = "Saves images to S3 and displays them in the UI."
 
     def s3_save_images(
         self,
@@ -75,8 +75,15 @@ class S3SaveImages:
         compress_level: int = 6,
         prompt: Optional[dict[str, Any]] = None,
         extra_pnginfo: Optional[dict[str, Any]] = None,
-    ) -> Tuple[str, torch.Tensor]:
-        urls = []
+    ) -> dict[str, dict[str, Any]]:
+        results: list[dict[str, str]] = []
+        urls: list[str] = []
+
+        output_dir = cast(str, folder_paths.get_output_directory())
+        full_output_folder = os.path.join(output_dir, folder)
+
+        if not os.path.exists(full_output_folder):
+            os.makedirs(full_output_folder)
 
         for index, image in enumerate(images):
             # Convert tensor to image
@@ -103,6 +110,10 @@ class S3SaveImages:
 
             s3_key = f"{folder}/{filename}" if folder else filename
 
+            # Save file locally for UI
+            local_filepath = os.path.join(full_output_folder, filename)
+            img.save(local_filepath, pnginfo=metadata, compress_level=compress_level)
+
             # Save image to in-memory buffer for S3 upload
             image_buffer = io.BytesIO()
             img.save(
@@ -116,8 +127,11 @@ class S3SaveImages:
             # Upload to S3
             self.client.upload_fileobj(image_buffer, bucket, s3_key)
 
-            # Store URL
+            # Store result for UI and URL
+            results.append(
+                {"filename": filename, "subfolder": folder, "type": "output"}
+            )
             url = f"https://{bucket}/{s3_key}"
             urls.append(url)
 
-        return ("\n".join(urls), images)
+        return {"ui": {"images": results, "text": "\n".join(urls)}}
